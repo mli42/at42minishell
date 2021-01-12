@@ -1,23 +1,63 @@
-This is a minishell, a 42 school project that reproduce a basic shell, or
-command interpreter. we did all the bonuses except for the HERE_DOCUMENT ("<<"
-operator).
-So we handle the line editing like in the real bash, with the history and some
-custom copy past, go-to-the-end (ctrl+e or END key), go-to-the-beginning
-(ctrl + a or HOME key), navigate between words (ctrl + left and ctrl + right),
-navigate between lines (ctrl + up, ctrl + down). we handle the multiline
-edition and the use of the PS2 prompt.
-We also handle the pathname expansions. alowing multiple '/' in a raw like in
-the real bash. quoted stars are differenciated from wild cards, therefore not
-expanded.
-We also handle the "&&" and "||" and the parenthesis for complexe commands and
-subshells trhough the use of an abstract synthax tree.
-we added extra bonuses like the tild expansion, field splitting when
-doing variable expansions, the shlvl environment variable is updated, the
-possibility to update the prompt PS1 and PS2, the ability to change the window
-size, similar shell error messages like ambiguous redirections, "cd -", "cd ~"
+# at42minishell
 
+This is a minishell, a 42 school project that reproduce a basic shell, or CLI.
 
-Main behavior of the minishell:
+We use an AST ([Abstract Syntax Tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree))!
+
+We did all the bonuses except the `HERE_DOCUMENT` (`<<` operator).
+
+Made by [charmstr](https://github.com/charMstr) and [me](https://github.com/mli42).
+
+## Usage
+```shell
+# Compile minishell with the Makefile
+make -j4
+
+# Start the shell
+./minishell
+```
+
+## Features
+
+- [x] Line editing (<kbd>←</kbd> / <kbd>→</kbd>)
+- [x] History (<kbd>↑</kbd> / <kbd>↓</kbd>)
+- [x] Copy (start: <kbd>CTRL</kbd>+<kbd>K</kbd> | stop : <kbd>CTRL</kbd>+<kbd>K</kbd>)
+- [x] Past (<kbd>CTRL</kbd>+<kbd>P</kbd>)
+- [x] Cut (start: <kbd>CTRL</kbd>+<kbd>K</kbd> | stop : <kbd>CTRL</kbd>+<kbd>L</kbd>)
+
+- [x] Built-ins
+    - `echo`
+       - `-n` flag
+    - `cd` (absolute/relative path + ~/-)
+    - `pwd`
+    - `export`
+    - `unset`
+    - `env`
+    - `exit`
+- [x] Launch binaries from `$PATH` (of course)
+
+- [x] Semicolons (`;`)
+- [x] Pipes (`|`)
+- [x] Quotes (`"`, `'`)
+- [x] Redirections (`>`, `>>`, `<`)
+- [x] Signals (`CTRL-C` / `CTRL-\` / `CTRL-D`)
+- [x] `AND` operator (`&&`), `OR` operator (`||`)
+- [x] Parenthesis priority, creates a subshell (`(cmd)`)
+- [x] Environment variables (ex: `$PATH`) + `$?`
+
+- [x] Go start of line (<kbd>CTRL</kbd>+<kbd>A</kbd> or <kbd>HOME</kbd>)
+- [x] Go end of line (<kbd>CTRL</kbd>+<kbd>E</kbd> or <kbd>END</kbd>)
+
+- [x] Navigate between words (<kbd>CTRL</kbd>+<kbd>←</kbd> and <kbd>CTRL</kbd>+<kbd>→</kbd>)
+- [x] Navigate between lines (<kbd>CTRL</kbd>+<kbd>↑</kbd> and <kbd>CTRL</kbd>+<kbd>↓</kbd>)
+
+- [x] Multiline (giving a line with unclosed quote (`"`, `'`) or backslash (`\`) prints a PS2 until the line is finished)
+- [x] Pathname expansion. Wildcard `*` (unquoted)
+
+- [x] Update `SHLVL`, the prompts `PS1` and `PS2`
+- [x] Ambiguous Redirections
+
+## Main behavior of the minishell:
 
 the parsing happens in two disctinct STEPS
 	1) lexer (lexical analizer)	=> creates tokens
