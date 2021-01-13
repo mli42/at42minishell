@@ -1,8 +1,8 @@
 # at42minishell
 
-This is a minishell, a 42 school project that reproduce a basic shell, or CLI.
+This is a minishell, a 42 school project that reproduce a basic shell (CLI).
 
-We use an AST ([Abstract Syntax Tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree))!
+We use an AST! ([Abstract Syntax Tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree))
 
 We did all the bonuses except the `HERE_DOCUMENT` (`<<` operator).
 
@@ -59,75 +59,53 @@ make -j4
 
 ## Main behavior of the minishell:
 
-the parsing happens in two disctinct STEPS
-	1) lexer (lexical analizer)	=> creates tokens
-	2) parser => process the tokens acording to a grammar and builds an
-	abstract synthax tree of all the commands we need to run.	
-	note:	we do hande the "&&" and "||" operators, as well as the parenthesis
-			to start subshells.
+I] Get the next command line:
 
-I]	getting the next command line:
-	the terminal is put in raw mode in order to have an exact bash like
-	input interface.
-	- we have a history of the last commands launched. (ctrl up
-	and ctrl down). that could be the only difference between the real bash, if
-	we go up in the history and sart to edit a command line, then change to an
-	other line in history back and forth, the edition we just did gets lost.
-	Except for that every features of bash is reproduced.
-	note: hitting the tab key doesnt do the autocompletion of file names or
-	commands.
-	The trailing <backslash> and <newline> are removed before splitting the
-	input into tokens.
+*   The terminal is put in raw mode in order to have an exact bash-like input interface.
 
-II] tokenisation (aka lexing)
+II] Tokenisation (aka Lexing):
 
-	1) char by char, create tokens with the lexer. If the tokens arent finished
-	at the end of the user's input (unmatching quotes or parenthesis,
-	escaped new-line...):
-	--> prompt a PS2. redo it UNTIL the all the tokens are closed.
-	note: fix set of metacharacter to separate tokens (unquoted and unescaped)
-		<space>, <tab>, <newline>, ;, (, ), |, &, <, >.
+1) Create tokens with the Lexer (lexical analizer).
 
-	2) then when the token constructs are fully complete we can stop getting
-	the user 's input, and start to parse the command.
+If the user's input isn't finished (unmatching quotes or parenthesis, backslash): prompt a PS2 until it's ok.
 	
-	3) categorizing the tokens as we creat them from left to right.
-	Once a token is delimited, make sure its being categorized as required by
-	the shell grammar.
-
-	4) separate in between: OPERATOR (including IO_NUMBER...) or TOKEN
+2) Categorizing the tokens as we create them from left to right.
 	
-III]	build an abstract tree in the parser section.
-		thanks to the operators, we can identify the begining and end of jobs.
+III] Parsing:
 
-IV]	in each simple commands the tokens list is subject to word expansion:
-	1)	tild expansion is done at the begining of a potential path, or after
-		the first '=' sign that is in between a label=value pattern.
-		ex: echo salut=~:~/Projects:~/hey -> 
-		salut=/HOME/charmstr:/HOME/charmstr/Projects:/HOME/charmstr/hey
-	2)	parameter expansion
-			example: $PWD -> /home/...
-	3)	field splitting, applied to the parameter expansion, only if in an
-		unquoted section of text.
-			example:	export hey="one       two"
-						echo $hey --> one two
-						the spaces are removed, expansion got split in two.
-						echo "$hey" --> one      two
-						the spaces arent removed. still one uniq string.
-	note:	portion of the new strings that come from an expansion are
-			marked as protected against late quote removal. every char is
-			to be taken litteraly.
-	4)	pathname expansion
-			example: ls -> salut salop salt samy
-					 echo sal* -> salut salop salt
-	note:	it only applies if the '*' is unquoted (unescaped etc).
-			if it doesnt apply, we jump to step 5.
-			also note that some quote removal is done before
-			this action occurs.
-	5)	quote removal (not on the protected strings parts resulting
-			from the parameter expansion).
+*   Process the tokens according to a grammar and builds an AST of all the commands to run.
 
-V]	Redirection is performed if necessary. they are separated from the argv,
-	but kept in the order of appearance. redirecting stdin and stdout temporary
+Thanks to the operators, we can identify the beginning and end of jobs.
 
-VI]	Commands are executed. then a new prompt is displayed.
+IV] Word expansion:
+
+1) Tild expansion (`~`) is done at the beginning of a potential path, or after
+the first '=' sign that is in between a label=value pattern:
+```bash
+$ echo salut=~:~/Projects:~/hey # => salut=/HOME/charmstr:/HOME/charmstr/Projects:/HOME/charmstr/hey
+```
+
+2) Parameter expansion. ex:`$PWD` becomes `/home/...`
+
+3) Field splitting, applied to the parameter expansion, only if in an unquoted section of text.
+```bash
+$ export foo="one       two"
+$ echo $foo # Spaces are removed, expansion got split in two: one two
+$ echo "$foo" # Spaces aren't removed. still one unique string: one      two
+```
+note: new strings that comes from an expansion are marked as protected against late quote removal.
+
+4) Pathname expansion
+```bash
+$ ls # foo foobar foobar2
+$ echo fo* # -> foo foobar foobar2
+```
+note:	it only applies if the `*` is unquoted, unescaped, etc.
+
+5) Quote removal
+
+V] Redirections are performed if necessary.
+
+*  They are separated from the argv, but kept in the order of appearance. Redirecting stdin and stdout.
+
+VI]	Commands are executed. A new prompt is displayed.
