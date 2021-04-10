@@ -8,6 +8,10 @@ We did all the bonuses except the `HERE_DOCUMENT` (`<<` operator).
 
 Made by [charmstr](https://github.com/charMstr) and [me](https://github.com/mli42).
 
+<p align="center">
+        <img src="./minishell.gif" >
+</p>
+
 ## Usage
 ```shell
 # Compile minishell with the Makefile
@@ -68,9 +72,9 @@ II] Tokenisation (aka Lexing):
 1) Create tokens with the Lexer (lexical analizer).
 
 If the user's input isn't finished (unmatching quotes or parenthesis, backslash): prompt a PS2 until it's ok.
-	
+
 2) Categorizing the tokens as we create them from left to right.
-	
+
 III] Parsing:
 
 *   Process the tokens according to a grammar and builds an AST of all the commands to run.
